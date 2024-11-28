@@ -1,12 +1,12 @@
 package orgol;
 
-import orgol.common.OrgolScore;
+import orgol.controller.MainController;
 
 public class Main {
 
 	public static void main(String[] args) {
 		
-		new OrgolScore();
+		new MainController();
 
 	}
 

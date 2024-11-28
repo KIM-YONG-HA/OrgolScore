@@ -5,7 +5,7 @@ public class MidiController {
 	
 	public MidiController() {
 		
-		System.out.println("MidiController...");
+		//System.out.println("MidiController...");
 		
 		
 	}
