@@ -11,20 +11,30 @@ public class CustomFontExample extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        // 배경색 설정
+        getContentPane().setBackground(new Color(0X0560EB));
+
         // 사용자 정의 폰트 로드
-        try (InputStream fontStream = getClass().getClassLoader().getResourceAsStream("resource/font/강원교육모두 Bold.ttf")) {
+        try (InputStream fontStream = getClass().getClassLoader().getResourceAsStream("resource/font/CookieRunBold.ttf")) {
             if (fontStream == null) {
                 throw new IOException("폰트 파일을 찾을 수 없습니다.");
             }
 
-            Font customFont = Font.createFont(Font.TRUETYPE_FONT, fontStream).deriveFont(24f);
-            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-            ge.registerFont(customFont); // 폰트를 시스템에 등록
+            // 기본 폰트 생성
+            Font customFont = Font.createFont(Font.TRUETYPE_FONT, fontStream).deriveFont(50f);
 
-            // JLabel에 사용자 정의 폰트 적용
-            JLabel label = new JLabel("Hello with Custom Font! 안녕하세요", SwingConstants.CENTER);
+            // 굵은 스타일로 변경
+            Font boldCustomFont = customFont.deriveFont(Font.BOLD);
+
+            // JLabel에 굵은 스타일의 폰트 적용
+            JLabel label = new JLabel("오스 :: ORGOL SCORE", SwingConstants.CENTER);
+            label.setFont(boldCustomFont);
+            label.setForeground(new Color(0xffffff)); // 폰트 색상 설정 (하얀색)
             
-            label.setFont(customFont);
+            //FFD700
+            
+            //F0F0F0
+            
             add(label);
         } catch (FontFormatException | IOException e) {
             e.printStackTrace();

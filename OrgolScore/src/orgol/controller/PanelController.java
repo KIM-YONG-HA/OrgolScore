@@ -30,6 +30,7 @@ public class PanelController {
 	public void menuBarPanel() {
 		
 		System.out.println("메뉴바");
+		// https://blog.naver.com/rain483/220736445264
 		
 	}
 	
