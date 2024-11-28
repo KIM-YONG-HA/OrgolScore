@@ -1,12 +1,12 @@
 package orgol;
 
+import orgol.common.OrgolScore;
+
 public class Main {
 
 	public static void main(String[] args) {
 		
-		
-		
-		System.out.println("오르골 ...");
+		new OrgolScore();
 
 	}
 
