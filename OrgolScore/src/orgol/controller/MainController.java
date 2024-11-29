@@ -25,7 +25,6 @@ public class MainController {
 	// initialize 
 	public void init() {
 
-	
 		
 		System.out.println("[init] ...");
 		
