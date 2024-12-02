@@ -2,10 +2,10 @@ package orgol.controller;
 
 public class MainController {
 
-	private FrameController frame;
-	private PanelController panel;
-	private PlayBarController play;
-	private MidiController midi; 
+	private FrameController frameController;
+	private PanelController panelController;
+	private PlayBarController playBarController;
+	private MidiController midiController; 
 	
 	
 	// Contructor
@@ -25,10 +25,10 @@ public class MainController {
 	public void init() {
 		
 		System.out.println("[init] ...");
-		frame = new FrameController();
-		panel = new PanelController();
-		play = new PlayBarController();
-		midi = new MidiController();
+		frameController = new FrameController();
+		panelController = new PanelController();
+		playBarController = new PlayBarController();
+		midiController = new MidiController();
 		
 
 	}
@@ -41,15 +41,17 @@ public class MainController {
 		
 		System.out.println("[run] ...");
 		
+
 		
-		// 스플래시 
-		mainSlashScreen();
+		
+		
+		frameController.createSplashFrame();
 		
 		
 		
 		
 		// 메인 영역 생성
-		frame.createMainFrame();
+		//frame.createMainFrame();
 		
 		// 
 		
@@ -60,14 +62,7 @@ public class MainController {
 		
 	}
 	
-	
-	public void mainSlashScreen() {
-		
-		System.out.println("[mainSlashScreen] 스플래시 시작");
-		System.out.println();
-		
-	}
-	
+
 	
 	
 	public void fontCustom() {

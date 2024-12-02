@@ -1,9 +1,20 @@
 package orgol.controller;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Font;
+import java.awt.FontFormatException;
+import java.io.IOException;
+import java.io.InputStream;
+
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 public class FrameController {
 	
@@ -11,11 +22,78 @@ public class FrameController {
 	
 	public FrameController() {
 		
+		frame = new JFrame();
 		
 	}
 	
 	
-	// 프레임 생성
+	
+	
+	public void createSplashFrame() {
+		
+		
+		
+        // 스플래시 페이지의 크기 및 설정
+        frame.setSize(360, 230);
+        frame.setLocationRelativeTo(null); // 화면 중앙에 위치
+        
+        frame.setDefaultCloseOperation(frame.EXIT_ON_CLOSE);
+		frame.setUndecorated(true); // 타이틀 바 제거
+        
+
+        Container c = frame.getContentPane();
+        
+        
+        // 로고 또는 로딩 화면 구성 요소 설정
+        JPanel splashPanel = new JPanel(new BorderLayout());
+        splashPanel.setBackground(new Color(0X0560EB)); // 배경색 설정
+      
+        
+        
+        // 사용자 정의 폰트 로드
+        try  {
+        	
+        	InputStream fontStream = getClass().getClassLoader().getResourceAsStream("resource/font/CookieRunBold.ttf");
+        	
+        	if (fontStream == null) throw new IOException("폰트 파일을 찾을 수 없습니다.");
+
+            // 기본 폰트 생성
+            Font customFont = Font.createFont(Font.TRUETYPE_FONT, fontStream).deriveFont(20f);
+
+            // 굵은 스타일로 변경
+            Font boldCustomFont = customFont.deriveFont(Font.BOLD);
+
+            // JLabel에 스타일의 폰트 적용
+            JLabel splashLabel = new JLabel("오스 :: ORGOL SCORE", SwingConstants.CENTER);
+            splashLabel.setFont(boldCustomFont);
+            splashLabel.setForeground(new Color(0xffffff));
+            
+            //FFD700
+            //F0F0F0
+            
+            splashPanel.add(splashLabel);
+            
+        } catch (FontFormatException | IOException e) {
+        	
+            e.printStackTrace();
+            System.out.println("폰트를 로드하는 중 문제가 발생했습니다.");
+            
+        }
+        
+      
+        
+        c.add(splashPanel);
+        
+              
+        
+
+
+        
+        frame.setVisible(true);
+		
+	}
+	
+	
 	
 	public void createMainFrame() {
 		
