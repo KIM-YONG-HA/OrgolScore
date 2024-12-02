@@ -15,6 +15,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
 public class FrameController {
 	
@@ -58,7 +60,7 @@ public class FrameController {
         	if (fontStream == null) throw new IOException("폰트 파일을 찾을 수 없습니다.");
 
             // 기본 폰트 생성
-            Font customFont = Font.createFont(Font.TRUETYPE_FONT, fontStream).deriveFont(20f);
+            Font customFont = Font.createFont(Font.TRUETYPE_FONT, fontStream).deriveFont(24f);
 
             // 굵은 스타일로 변경
             Font boldCustomFont = customFont.deriveFont(Font.BOLD);
@@ -90,6 +92,17 @@ public class FrameController {
 
         
         frame.setVisible(true);
+        
+        
+        // 스플래시 화면 일정 시간 유지 후 메인 프레임 실행
+        Timer timer = new Timer(3000, e -> {
+            frame.dispose(); // 스플래시 화면 닫기
+            SwingUtilities.invokeLater(this::createMainFrame); // 메인 프레임 생성
+        });
+        timer.setRepeats(false);
+        timer.start();
+        
+        
 		
 	}
 	
@@ -108,15 +121,20 @@ public class FrameController {
 		frame.setUndecorated(true); // 타이틀 바 제거
 		
 
-        //frame.setExtendedState(JFrame.MAXIMIZED_BOTH); // 최대화
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH); // 최대화
 
-		
-		// 메뉴 타이틀
 		
 		
 		
 		// 메뉴바 
 		frame.setJMenuBar(menuBar());
+		
+		
+		
+		
+		
+		
+		
 		
 		frame.setVisible(true);
 		

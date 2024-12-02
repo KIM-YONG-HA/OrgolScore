@@ -2,7 +2,7 @@ package orgol.controller;
 
 import javax.swing.SwingUtilities;
 
-public class MainController {
+public class MainController2 {
 
 	private FrameController frameController;
 	private PanelController panelController;
@@ -11,7 +11,7 @@ public class MainController {
 	
 	
 	// Contructor
-	public MainController() {
+	public MainController2() {
 		
 		System.out.println("[MainController] ... ");
 		System.out.println();
