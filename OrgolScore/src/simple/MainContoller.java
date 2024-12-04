@@ -1,7 +1,6 @@
 package simple;
 
 import java.awt.BorderLayout;
-import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -13,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -30,13 +30,23 @@ public class MainContoller {
     private Font customFont;
     private JPanel mainPanel;
     private JPanel workSpacePanel;
-	
+	String[] scale = {
+			
+		    "C3", "D3", "G3", "A3", "B3", "C4", "D4", "E4", "F4", "F#4", 
+		    "G4", "G#4", "A4", "A#4", "B4", "C5", "C#5", "D5", "D#5", "E5", 
+		    "F5", "G5", "G#5", "A5", "A#5", "B5", "C6", "D6", "E6"
+		    
+		};
 
 	public MainContoller() {
 
 		frame = new JFrame();
 		c = frame.getContentPane();
 		createMainFrame();
+		
+
+
+		
 
 	}
 
@@ -44,7 +54,7 @@ public class MainContoller {
 
 		frame.setTitle("오르골 악보 제작 프로그램");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(400, 300);
+		frame.setSize(1024, 600);
 		frame.setUndecorated(true); // 타이틀 바 제거
 		frame.setExtendedState(JFrame.MAXIMIZED_BOTH); // 최대화
 
@@ -101,18 +111,46 @@ public class MainContoller {
 
 	    // 1. 상단: 미디 찍는 영역
 	    JPanel midiArea = new JPanel();
-	    midiArea.setLayout(new GridLayout(1, 256, 0, 0));
+	    midiArea.setLayout(new BorderLayout());
         midiArea.setBackground(new Color(0xFFFFFF));
+        
+        
+        
+        JPanel midiLeftArea = new JPanel();
+        midiLeftArea.setLayout(new GridLayout(scale.length,1));
+        
+        for(int i=0;i<scale.length;i++) {
+        	
+        	JLabel scaleLabel = new JLabel(scale[i]);
+        	scaleLabel.setFont(setCustomFont("PretendardVariable", 12));      	
+        	midiLeftArea.add(scaleLabel);
+        	
+        }
+      
+        
+        midiArea.add(midiLeftArea, BorderLayout.WEST);
+        
+        
+        JPanel midiRightArea = new JPanel();
+        midiRightArea.setBackground(new Color(0x2F2F2F));
+        midiRightArea.add(new JLabel("right1"));
+        midiArea.add(midiRightArea, BorderLayout.EAST);
+        
+        
+        
+        
+        
+        
         //midiArea.setPreferredSize(new Dimension(1920, 500));
         
         
-        // 버튼 256개 추가 (32마디 x 8개)
-        for (int i = 1; i <= 256; i++) {
-        	    JButton button = new JButton("c " + i);
-        		button.setMargin(new Insets(10, 20, 10, 20)); 
-                midiArea.add(button);
-        	}
-	    
+//        // 버튼 256개 추가 (32마디 x 8개)
+//        for (int i = 1; i <= 256; i++) {
+//        	    JButton button = new JButton("c " + i);
+//        		button.setMargin(new Insets(10, 20, 10, 20)); 
+//                midiArea.add(button);
+//        	}
+//	    
 	    
 	    
 
@@ -200,3 +238,4 @@ public class MainContoller {
 	
 
 }
+
