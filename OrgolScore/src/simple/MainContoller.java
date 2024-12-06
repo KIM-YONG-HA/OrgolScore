@@ -1,6 +1,5 @@
 package simple;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -8,11 +7,11 @@ import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -28,8 +27,21 @@ public class MainContoller {
     private JFrame frame;
     private Container c;
     private Font customFont;
+    
+    
+    Toolkit toolkit = Toolkit.getDefaultToolkit();
+    Dimension screenSize = toolkit.getScreenSize();
+    
+    int screenWidth = screenSize.width;
+    int screenHeight = screenSize.height;
+    
+    
+    
     private JPanel mainPanel;
     private JPanel workSpacePanel;
+    
+    
+    
 	String[] scale = {
 			
 		    "C3", "D3", "G3", "A3", "B3", "C4", "D4", "E4", "F4", "F#4", 
@@ -44,7 +56,7 @@ public class MainContoller {
 		c = frame.getContentPane();
 		createMainFrame();
 		
-
+		customFont = setCustomFont("PretendardVariable", 12);
 
 		
 
@@ -52,12 +64,13 @@ public class MainContoller {
 
 	public void createMainFrame() {
 
-		frame.setTitle("오르골 악보 제작 프로그램");
+		frame.setTitle("Orgol Score");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(1024, 600);
+		frame.setSize(screenWidth, screenHeight);
 		frame.setUndecorated(true); // 타이틀 바 제거
 		frame.setExtendedState(JFrame.MAXIMIZED_BOTH); // 최대화
-
+		frame.setLocationRelativeTo(null); 
+		 
         c.setBackground(new Color(0x0560EB));
         c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
 
@@ -103,77 +116,188 @@ public class MainContoller {
 		
 	    c.removeAll();
 	    c.setBackground(new Color(0x123456));
-	    c.setLayout(new BorderLayout()); 
-	    
-
 	    
 	    
-
-	    // 1. 상단: 미디 찍는 영역
+	    // wrapper 스크롤
+	    JPanel wrap = new JPanel();
+	    wrap.setLayout(null);
+    	wrap.setBounds(0, 0, screenWidth, screenHeight);
+    	wrap.setBackground(Color.gray);
+    	
+    	
+    	// 상단
 	    JPanel midiArea = new JPanel();
-	    midiArea.setLayout(new BorderLayout());
-        midiArea.setBackground(new Color(0xFFFFFF));
-        
+	    midiArea.setLayout(null);
+        midiArea.setBackground(new Color(0xFFFFcc));
+        midiArea.setBounds(0,0,screenWidth,600);
         
         
         JPanel midiLeftArea = new JPanel();
-        midiLeftArea.setLayout(new GridLayout(scale.length,1));
+        midiLeftArea.setLayout(null);
+        midiLeftArea.setBounds(0,0,50,600);
         
-        for(int i=0;i<scale.length;i++) {
-        	
-        	JLabel scaleLabel = new JLabel(scale[i]);
-        	scaleLabel.setFont(setCustomFont("PretendardVariable", 12));      	
-        	midiLeftArea.add(scaleLabel);
-        	
+        
+        int x = 0;
+        int y = 0;
+        
+        for (int i = scale.length - 1; i >= 0; i--) {
+
+            JLabel scaleLabel = new JLabel(scale[i], SwingConstants.CENTER);
+            scaleLabel.setFont(customFont);  
+            scaleLabel.setOpaque(true); 
+
+            
+            scaleLabel.setBounds(x,y,50,20); 
+
+            if (i % 2 == 0) {
+                scaleLabel.setBackground(new Color(0xCCCCCC));
+            }
+
+            midiLeftArea.add(scaleLabel);
+            
+            y+=20;
+            
         }
-      
         
-        midiArea.add(midiLeftArea, BorderLayout.WEST);
+        midiArea.add(midiLeftArea);
+        
+        
         
         
         JPanel midiRightArea = new JPanel();
-        midiRightArea.setBackground(new Color(0x2F2F2F));
-        midiRightArea.add(new JLabel("right1"));
-        midiArea.add(midiRightArea, BorderLayout.EAST);
+        midiRightArea.setBackground(new Color(0xabcabc));
+        midiRightArea.setLayout(null);
+        //midiRightArea.setBounds(50,0,screenWidth-85,500);
+        
+        
+		
+		  // 버튼 256개 추가 (32마디 x 8개)
+		  
+        	int midiPosX = 0;
+        	int midiPosY = 0;
+        	        	
+			for (int i = 1; i <= 29; i++) {
+
+				midiPosX = 0;
+				
+				for (int j = 1; j <= 256; j++) {
+					
+					
+					JLabel button = new JLabel("C" + i + " " + j + " ", SwingConstants.CENTER);
+					button.setFont(customFont);
+					button.setOpaque(true);
+					button.setBackground(Color.white);
+					button.setBounds(midiPosX, midiPosY, 100, 20);
+					midiRightArea.add(button);
+
+				
+					midiPosX += 100;
+					
+				}
+				
+				midiPosY += 20;
+
+			}
+		  
+	        
+        JScrollPane midiScrollPane = setJScrollPane(midiRightArea, 1);
+        midiScrollPane.setBounds(50, 0, screenWidth-85, 600);
+		  
+		 
+		 
+        
+   
+        midiArea.add(midiScrollPane);
         
         
         
+        
+        
+        
+        // 중단
+        JPanel scoreArea = new JPanel();
+	    scoreArea.setBackground(new Color(0x123456)); // 회색 배경
+	    scoreArea.add(new JLabel("악보"));
+        
+        
+        
+	    
+	    
+	    JPanel playBarArea = new JPanel();
+	    playBarArea.setBackground(new Color(0x999999)); // 짙은 회색 배경
+	    playBarArea.add(new JLabel("플레이바"));
+	    playBarArea.setPreferredSize(new Dimension(1920, 50)); 
+
+        
+        
+        
+        
+        
+        wrap.add(midiArea);
+       // wrap.add(scoreArea);
+       // wrap.add(playBarArea);
+        
+        
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        c.add(setJScrollPane(wrap, 1));
+	    
+	    /*  
+	    
+
+        
+
+        
+        
+        //long startTime = System.currentTimeMillis();
+       
+
+
+        
+        
+        //long endTime = System.currentTimeMillis();
+        //System.out.println( (endTime - startTime) + " ms");
+        
+     
+        
+        
+        
+        
+        
+       
         
         
         
         //midiArea.setPreferredSize(new Dimension(1920, 500));
         
         
-//        // 버튼 256개 추가 (32마디 x 8개)
-//        for (int i = 1; i <= 256; i++) {
-//        	    JButton button = new JButton("c " + i);
-//        		button.setMargin(new Insets(10, 20, 10, 20)); 
-//                midiArea.add(button);
-//        	}
-//	    
+
 	    
 	    
 
-	    // JScrollPane에 midArea를 추가
-	    JScrollPane midiScrollPane = new JScrollPane(midiArea);
-	    midiScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-	    midiScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
 	    // 2. 중단: 악보 영역
-	    JPanel scoreArea = new JPanel();
-	    scoreArea.setBackground(new Color(0x123456)); // 회색 배경
-	    scoreArea.add(new JLabel("악보"));
+	    
 
 	    // 3. 하단: 플레이바 영역
-	    JPanel playBarArea = new JPanel();
-	    playBarArea.setBackground(new Color(0x999999)); // 짙은 회색 배경
-	    playBarArea.add(new JLabel("플레이바"));
-	    playBarArea.setPreferredSize(new Dimension(1920, 100)); 
-
+	   
 	    // 컨테이너에 패널 추가
-	    c.add(midiScrollPane, BorderLayout.NORTH); // 스크롤 가능한 미디 영역
+	    c.add(midiArea, BorderLayout.NORTH); // 스크롤 가능한 미디 영역
 	    c.add(scoreArea, BorderLayout.CENTER);     // 악보 영역
 	    c.add(playBarArea, BorderLayout.SOUTH);   // 플레이바 영역
+
+
+	     */
+
+
 
 	    // 화면 갱신
 	    frame.revalidate();
@@ -230,6 +354,60 @@ public class MainContoller {
 	}
 	
 	
+	
+	
+	public JScrollPane setJScrollPane(JPanel panel, int status) {
+		
+
+		
+		JScrollPane wrap = new JScrollPane(panel);
+		
+		if(status == 1) {
+			
+			wrap.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+			wrap.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+			
+		} else {
+			
+			wrap.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		}
+		
+    	
+    	
+    	wrap.getVerticalScrollBar().setUnitIncrement(10);
+    	
+//    	wrap.getVerticalScrollBar().setUI(new BasicScrollBarUI() {
+//            @Override
+//            protected JButton createDecreaseButton(int orientation) {
+//                JButton btn = new JButton();
+//                btn.setPreferredSize(new Dimension(0, 0));
+//                btn.setMinimumSize(new Dimension(0, 0));
+//                btn.setMaximumSize(new Dimension(0, 0));
+//
+//                return btn;
+//            }
+//
+//            @Override
+//            protected JButton createIncreaseButton(int orientation) {
+//                JButton btn = new JButton();
+//                btn.setPreferredSize(new Dimension(0, 0));
+//                btn.setMinimumSize(new Dimension(0, 0));
+//                btn.setMaximumSize(new Dimension(0, 0));
+//                return btn;
+//            }
+//
+//            @Override
+//            protected void configureScrollBarColors() {
+//                this.thumbColor = new Color(0x4d4d4d);
+//                this.trackColor = new Color(0x171717);
+//            }
+//        });
+    	
+		return wrap;
+    	
+    	         
+         
+	}
 	
 	
 	
