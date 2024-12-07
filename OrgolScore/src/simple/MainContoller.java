@@ -5,14 +5,19 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontFormatException;
-import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -28,27 +33,25 @@ public class MainContoller {
     private Container c;
     private Font customFont;
     
+    private int screenWidth;
+    private int screenHeight;
     
-    Toolkit toolkit = Toolkit.getDefaultToolkit();
-    Dimension screenSize = toolkit.getScreenSize();
-    
-    int screenWidth = screenSize.width;
-    int screenHeight = screenSize.height;
-    
-    
+    //private static final Border DEFAULT_BORDER = BorderFactory.createLineBorder(Color.BLACK, 1);
     
     private JPanel mainPanel;
     private JPanel workSpacePanel;
     
     
     
-	String[] scale = {
+	private String[] scale = {
 			
 		    "C3", "D3", "G3", "A3", "B3", "C4", "D4", "E4", "F4", "F#4", 
 		    "G4", "G#4", "A4", "A#4", "B4", "C5", "C#5", "D5", "D#5", "E5", 
 		    "F5", "G5", "G#5", "A5", "A#5", "B5", "C6", "D6", "E6"
 		    
 		};
+	
+	private String[] reversedScale = new String[scale.length];
 
 	public MainContoller() {
 
@@ -57,9 +60,21 @@ public class MainContoller {
 		createMainFrame();
 		
 		customFont = setCustomFont("PretendardVariable", 12);
-
+	    
+	    Toolkit toolkit = Toolkit.getDefaultToolkit();
+	    Dimension screenSize = toolkit.getScreenSize();
+	    screenWidth = screenSize.width;
+	    screenHeight = screenSize.height;
 		
 
+	    
+	    for (int i = 0; i < scale.length; i++) {
+	        reversedScale[i] = scale[scale.length - 1 - i];
+	    }
+	    
+	    
+	    
+	    
 	}
 
 	public void createMainFrame() {
@@ -67,7 +82,7 @@ public class MainContoller {
 		frame.setTitle("Orgol Score");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(screenWidth, screenHeight);
-		frame.setUndecorated(true); // 타이틀 바 제거
+		//frame.setUndecorated(true); // 타이틀 바 제거
 		frame.setExtendedState(JFrame.MAXIMIZED_BOTH); // 최대화
 		frame.setLocationRelativeTo(null); 
 		 
@@ -121,10 +136,10 @@ public class MainContoller {
 	    // wrapper 스크롤
 	    JPanel wrap = new JPanel();
 	    wrap.setLayout(null);
-    	wrap.setBounds(0, 0, screenWidth, screenHeight);
-    	wrap.setBackground(Color.gray);
-    	
-    	
+	    	wrap.setBounds(0, 0, screenWidth, screenHeight);
+	    	wrap.setBackground(Color.gray);
+	    	
+	    	
     	// 상단
 	    JPanel midiArea = new JPanel();
 	    midiArea.setLayout(null);
@@ -167,7 +182,8 @@ public class MainContoller {
         JPanel midiRightArea = new JPanel();
         midiRightArea.setBackground(new Color(0xabcabc));
         midiRightArea.setLayout(null);
-        //midiRightArea.setBounds(50,0,screenWidth-85,500);
+        midiRightArea.setPreferredSize(new Dimension(256 * 50, 29 * 20)); 
+
         
         
 		
@@ -183,15 +199,34 @@ public class MainContoller {
 				for (int j = 1; j <= 256; j++) {
 					
 					
-					JLabel button = new JLabel("C" + i + " " + j + " ", SwingConstants.CENTER);
+					JLabel button = new JLabel(reversedScale[i-1]);
 					button.setFont(customFont);
 					button.setOpaque(true);
-					button.setBackground(Color.white);
-					button.setBounds(midiPosX, midiPosY, 100, 20);
+					button.setBorder(BorderFactory.createLineBorder(new Color(0xB0B4B8), 1));
+					
+					button.setBackground(new Color(0xECF0F5));
+				 	button.setForeground(new Color(0xECF0F5));
+					
+					if(i%2==0) {
+						button.setBackground(new Color(0xB6C3CF));
+						button.setForeground(new Color(0xB6C3CF));
+					}
+					button.setBounds(midiPosX, midiPosY, 50, 20);
+					 // 마우스 클릭 이벤트 추가
+					button.addMouseListener(new MouseAdapter() {
+			            @Override
+			            public void mouseClicked(MouseEvent e) {
+			                // 배경색을 빨간색으로 변경
+			            	button.setBackground(new Color(0xC90033));
+			            	button.setForeground(Color.white);
+			            	playMidiSound("C3");
+			            	
+			            }
+			        });
 					midiRightArea.add(button);
 
 				
-					midiPosX += 100;
+					midiPosX += 50;
 					
 				}
 				
@@ -201,11 +236,8 @@ public class MainContoller {
 		  
 	        
         JScrollPane midiScrollPane = setJScrollPane(midiRightArea, 1);
-        midiScrollPane.setBounds(50, 0, screenWidth-85, 600);
+        midiScrollPane.setBounds(50, 0, screenWidth-66, 600);
 		  
-		 
-		 
-        
    
         midiArea.add(midiScrollPane);
         
@@ -214,15 +246,14 @@ public class MainContoller {
         
         
         
-        // 중단
+        // 중단 악보영역 
         JPanel scoreArea = new JPanel();
 	    scoreArea.setBackground(new Color(0x123456)); // 회색 배경
 	    scoreArea.add(new JLabel("악보"));
         
         
-        
 	    
-	    
+	    // 하단 플레이바 
 	    JPanel playBarArea = new JPanel();
 	    playBarArea.setBackground(new Color(0x999999)); // 짙은 회색 배경
 	    playBarArea.add(new JLabel("플레이바"));
@@ -232,76 +263,28 @@ public class MainContoller {
         
         
         
-        
         wrap.add(midiArea);
        // wrap.add(scoreArea);
        // wrap.add(playBarArea);
         
         
-
-        
-        
-        
-        
-        
-        
-        
-        
         
         c.add(setJScrollPane(wrap, 1));
+	
 	    
-	    /*  
-	    
-
-        
-
-        
         
         //long startTime = System.currentTimeMillis();
-       
-
-
-        
-        
         //long endTime = System.currentTimeMillis();
         //System.out.println( (endTime - startTime) + " ms");
         
      
         
-        
-        
-        
-        
-       
-        
-        
-        
-        //midiArea.setPreferredSize(new Dimension(1920, 500));
-        
-        
-
-	    
-	    
-
-
-	    // 2. 중단: 악보 영역
-	    
-
-	    // 3. 하단: 플레이바 영역
-	   
-	    // 컨테이너에 패널 추가
-	    c.add(midiArea, BorderLayout.NORTH); // 스크롤 가능한 미디 영역
-	    c.add(scoreArea, BorderLayout.CENTER);     // 악보 영역
-	    c.add(playBarArea, BorderLayout.SOUTH);   // 플레이바 영역
-
-
-	     */
-
 
 
 	    // 화면 갱신
 	    frame.revalidate();
 	    frame.repaint();
+	    
 	}
 
 	
@@ -355,27 +338,22 @@ public class MainContoller {
 	
 	
 	
-	
 	public JScrollPane setJScrollPane(JPanel panel, int status) {
-		
 
-		
 		JScrollPane wrap = new JScrollPane(panel);
-		
-		if(status == 1) {
-			
+
+		if (status == 1) {
+
 			wrap.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 			wrap.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-			
+
 		} else {
-			
+
 			wrap.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		}
-		
-    	
-    	
-    	wrap.getVerticalScrollBar().setUnitIncrement(10);
-    	
+
+		wrap.getVerticalScrollBar().setUnitIncrement(10);
+
 //    	wrap.getVerticalScrollBar().setUI(new BasicScrollBarUI() {
 //            @Override
 //            protected JButton createDecreaseButton(int orientation) {
@@ -402,14 +380,39 @@ public class MainContoller {
 //                this.trackColor = new Color(0x171717);
 //            }
 //        });
-    	
+
 		return wrap;
-    	
-    	         
-         
+
 	}
 	
 	
+	public static void playMidiSound(String scale) {
+
+		String filePath = "/resource/vst/orgol/" + scale + ".wav";
+
+		try {
+
+			// 클래스 로더를 통해 리소스를 가져옴
+			InputStream inputStream = MainContoller.class.getResourceAsStream(filePath);
+
+			if (inputStream == null) {
+				System.out.println("파일을 찾을 수 없습니다: " + filePath);
+			} else {
+				System.out.println("리소스 파일 로드 성공!");
+			}
+
+			AudioInputStream audioStream = AudioSystem.getAudioInputStream(inputStream);
+			Clip audioClip = AudioSystem.getClip();
+			audioClip.open(audioStream);
+			audioClip.start();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+	 
+	 
+	 
 	
 	
 	
