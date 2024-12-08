@@ -13,6 +13,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -41,6 +43,7 @@ public class MainContoller {
     private JPanel mainPanel;
     private JPanel workSpacePanel;
     
+    private List<JLabel> midiLabels = new ArrayList<>();
     
     
 	private String[] scale = {
@@ -216,11 +219,9 @@ public class MainContoller {
         
         
         midiRightArea.setPreferredSize(new Dimension(256 * 50, 29 * 20)); 
-
         
-        
-		
-		  // 버튼 256개 추가 (32마디 x 8개)
+	
+		// 버튼 256개 추가 (32마디 x 8개)
 		  
         	int midiPosX = 0;
         	int midiPosY = 50;
@@ -245,19 +246,16 @@ public class MainContoller {
 						button.setForeground(new Color(0xB6C3CF));
 					}
 					button.setBounds(midiPosX, midiPosY, 50, 20);
-					 // 마우스 클릭 이벤트 추가
+					
 					button.addMouseListener(new MouseAdapter() {
-			            @Override
-			            public void mouseClicked(MouseEvent e) {
-			               
-			            	
-			            	
-			            	
-			            	button.setBackground(new Color(0xC90033));
-			            	button.setForeground(Color.white);
-			            	playVstSound(button.getText());
-			            	
-			            }
+					    @Override
+					    public void mouseClicked(MouseEvent e) {
+					        button.setBackground(new Color(0xC90033));
+					        button.setForeground(Color.white);
+
+					        // 오디오 재생을 별도 스레드로 실행
+					        new Thread(() -> playVstSound(button.getText())).start();
+					    }
 			        });
 					midiRightArea.add(button);
 
@@ -269,7 +267,11 @@ public class MainContoller {
 				midiPosY += 20;
 
 			}
-		  
+			
+			
+
+        
+
 	        
         JScrollPane midiScrollPane = setJScrollPane(midiRightArea, 1);
         midiScrollPane.setBounds(50, 0, screenWidth-66, 650);
@@ -316,10 +318,55 @@ public class MainContoller {
 
 	    // 화면 갱신
 	    frame.revalidate();
-	    frame.repaint();
+	    //frame.repaint();
 	    
 	}
 
+	
+	
+	public JLabel createMidiLabels(JPanel p) {
+		
+			JLabel button = null;
+		    int midiPosX = 0;
+		    int midiPosY = 50;
+
+		    for (int i = 1; i <= 29; i++) {
+		    	
+		        midiPosX = 0;
+
+		        for (int j = 1; j <= 256; j++) {
+		            button = new JLabel(reversedScale[i - 1]);
+		            button.setFont(customFont);
+		            button.setOpaque(true);
+		            button.setBorder(BorderFactory.createLineBorder(new Color(0xB0B4B8), 1));
+		            button.setBounds(midiPosX, midiPosY, 50, 20);
+
+		            // 라벨을 리스트에 저장
+		            midiLabels.add(button);
+		            p.add(button);
+		            
+		            midiPosX += 50;
+		        }
+
+		        midiPosY += 20;
+		    }
+		
+		
+		    return button;
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	// 메뉴바 생성
 	public void createMenuBar() {}
@@ -411,9 +458,9 @@ public class MainContoller {
 			InputStream inputStream = MainContoller.class.getResourceAsStream(filePath);
 
 			if (inputStream == null) {
-				System.out.println("파일을 찾을 수 없습니다: " + filePath);
+				System.out.println("파일 없음 : " + filePath);
 			} else {
-				System.out.println("리소스 파일 로드 성공!");
+				//System.out.println("리소스 파일 로드 성공!");
 			}
 
 			AudioInputStream audioStream = AudioSystem.getAudioInputStream(inputStream);
