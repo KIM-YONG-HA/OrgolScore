@@ -144,12 +144,12 @@ public class MainContoller {
 	    JPanel midiArea = new JPanel();
 	    midiArea.setLayout(null);
         midiArea.setBackground(new Color(0xFFFFcc));
-        midiArea.setBounds(0,0,screenWidth,600);
+        midiArea.setBounds(0,0,screenWidth,650);
         
         
         JPanel midiLeftArea = new JPanel();
         midiLeftArea.setLayout(null);
-        midiLeftArea.setBounds(0,0,50,600);
+        midiLeftArea.setBounds(0,50,50,650);
         
         
         int x = 0;
@@ -182,6 +182,39 @@ public class MainContoller {
         JPanel midiRightArea = new JPanel();
         midiRightArea.setBackground(new Color(0xabcabc));
         midiRightArea.setLayout(null);
+        
+        
+
+        // 마디 
+        for(int i=0;i<32;i++) {
+        	
+            JLabel tmp = new JLabel("bar"+(i+1));
+            tmp.setBounds(400*i,0,400,25);
+            tmp.setOpaque(true);
+            tmp.setBackground(Color.gray);
+            midiRightArea.add(tmp);
+        	
+
+            
+        	
+        }
+        
+
+        
+        // 마디 내 박자
+        
+        for(int j=0;j<=3;j++) {
+        	
+            JLabel tmp2 = new JLabel("t"+(j+1));
+            tmp2.setBounds(50*j,25,50,25);
+            tmp2.setOpaque(true);
+            tmp2.setBackground(Color.yellow);
+            midiRightArea.add(tmp2);
+        	
+        }
+        
+        
+        
         midiRightArea.setPreferredSize(new Dimension(256 * 50, 29 * 20)); 
 
         
@@ -190,7 +223,7 @@ public class MainContoller {
 		  // 버튼 256개 추가 (32마디 x 8개)
 		  
         	int midiPosX = 0;
-        	int midiPosY = 0;
+        	int midiPosY = 50;
         	        	
 			for (int i = 1; i <= 29; i++) {
 
@@ -216,10 +249,13 @@ public class MainContoller {
 					button.addMouseListener(new MouseAdapter() {
 			            @Override
 			            public void mouseClicked(MouseEvent e) {
-			                // 배경색을 빨간색으로 변경
+			               
+			            	
+			            	
+			            	
 			            	button.setBackground(new Color(0xC90033));
 			            	button.setForeground(Color.white);
-			            	playMidiSound("C3");
+			            	playVstSound(button.getText());
 			            	
 			            }
 			        });
@@ -236,12 +272,10 @@ public class MainContoller {
 		  
 	        
         JScrollPane midiScrollPane = setJScrollPane(midiRightArea, 1);
-        midiScrollPane.setBounds(50, 0, screenWidth-66, 600);
+        midiScrollPane.setBounds(50, 0, screenWidth-66, 650);
 		  
    
         midiArea.add(midiScrollPane);
-        
-        
         
         
         
@@ -259,7 +293,6 @@ public class MainContoller {
 	    playBarArea.add(new JLabel("플레이바"));
 	    playBarArea.setPreferredSize(new Dimension(1920, 50)); 
 
-        
         
         
         
@@ -288,33 +321,14 @@ public class MainContoller {
 	}
 
 	
-	
-	
-	
 	// 메뉴바 생성
-	public void createMenuBar() {
-		
-		
-		
-	}
-	
+	public void createMenuBar() {}
 	
 	// 타이틀 바 생성
-	public void createTitleBar() {
-		
-		
-		
-	}
+	public void createTitleBar() {}
 	
 	
-	
-	
-	
-	
-	
-	
-	
-
+	// 폰트 커스텀 
 	private Font setCustomFont(String fontName, int fontSize) {
 
 		try {
@@ -337,7 +351,7 @@ public class MainContoller {
 	}
 	
 	
-	
+	// 스크롤 
 	public JScrollPane setJScrollPane(JPanel panel, int status) {
 
 		JScrollPane wrap = new JScrollPane(panel);
@@ -386,7 +400,8 @@ public class MainContoller {
 	}
 	
 	
-	public static void playMidiSound(String scale) {
+	
+	public static void playVstSound(String scale) {
 
 		String filePath = "/resource/vst/orgol/" + scale + ".wav";
 
