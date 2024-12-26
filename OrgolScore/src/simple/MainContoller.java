@@ -5,6 +5,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontFormatException;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -14,6 +15,7 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,9 +58,14 @@ public class MainContoller {
 			"D5", "D#5", "E5", "F5", "G5", "G#5", "A5", "A#5", "B5", "C6", "D6", "E6"
 
 	};
+	
+	
 
 	private String[] reversedScale = new String[scale.length];
-
+	
+	
+	// 메인 컨트롤러 
+	
 	public MainContoller() {
 
 		frame = new JFrame();
@@ -79,7 +86,10 @@ public class MainContoller {
 		}
 
 	}
+	
 
+	// 메인 프레임 생성 
+	
 	public void createMainFrame() {
 
 		frame.setTitle("Orgol Score");
@@ -125,10 +135,13 @@ public class MainContoller {
 
 	}
 
+	
+	// 워크스페이스 프레임 생성 
+	
 	public void createWorkSpaceFrame() {
 
 		c.removeAll();
-		c.setBackground(new Color(0x123456));
+		c.setBackground(new Color(0xffffff));
 
 		// wrapper 스크롤
 		JPanel wrap = new JPanel();
@@ -146,6 +159,11 @@ public class MainContoller {
 		midiLeftArea.setLayout(null);
 		midiLeftArea.setBounds(0, 50, 50, 650);
 
+		
+		
+		
+		// 스케일 출력 
+		
 		int x = 0;
 		int y = 0;
 
@@ -154,7 +172,6 @@ public class MainContoller {
 			JLabel scaleLabel = new JLabel(scale[i], SwingConstants.CENTER);
 			scaleLabel.setFont(customFont);
 			scaleLabel.setOpaque(true);
-
 			scaleLabel.setBounds(x, y, 50, 20);
 
 			if (i % 2 == 0) {
@@ -169,41 +186,53 @@ public class MainContoller {
 
 		midiArea.add(midiLeftArea);
 
+		
+		
+		
+		
 		JPanel midiRightArea = new JPanel();
 		midiRightArea.setBackground(new Color(0xabcabc));
 		midiRightArea.setLayout(null);
-
+		
+		// 마디 및 박자 출력 
+		
+		int defX = 0;
+		
 		// 마디
 		for (int i = 0; i < 32; i++) {
 
-			JLabel tmp = new JLabel("" + (i + 1), SwingConstants.LEFT);
-			tmp.setBounds(400 * i, 0, 400, 25);
-			tmp.setOpaque(true);
-			tmp.setBackground(Color.gray);
-			midiRightArea.add(tmp);
+			JLabel measure = new JLabel("" + (i + 1), SwingConstants.CENTER);
+			measure.setBounds(400 * i, 0, 400, 25);
+			measure.setOpaque(true);
+			measure.setBackground(Color.gray);
+			measure.setBorder(BorderFactory.createLineBorder(new Color(0xB0B4B8), 1));
+			midiRightArea.add(measure);
 			
 			
 			// 마디 내 박자
 
 			for (int j = 0; j <= 3; j++) {
 				
-				int defX = 100;
-				
-				JLabel tmp2 = new JLabel("" + (j + 1));
-				tmp2.setBounds(defX * j, 25, defX, 25);
-				tmp2.setOpaque(true);
-				tmp2.setBackground(new Color(0xcccccc));
-				midiRightArea.add(tmp2);
+				JLabel bit = new JLabel("" + (j+1) , SwingConstants.CENTER);
+				bit.setBounds(defX, 25, 100, 25);
+				bit.setOpaque(true);
+				bit.setBackground(new Color(0xcccccc));
+				bit.setBorder(BorderFactory.createLineBorder(new Color(0xB0B4B8), 1));
+				midiRightArea.add(bit);
 
+				defX += 100;
 				
 			}
 			
-			
-
 		}
-
-
-
+		
+		//System.out.println();
+		
+		
+		//createMidiLabels(midiRightArea);
+		
+		
+		
 		midiRightArea.setPreferredSize(new Dimension(256 * 50, 29 * 20));
 
 		// 버튼 256개 추가 (32마디 x 8개)
@@ -225,6 +254,11 @@ public class MainContoller {
 				button.setBackground(new Color(0xECF0F5));
 				button.setForeground(new Color(0xECF0F5));
 				button.putClientProperty("pos", "odd");
+			
+				button.putClientProperty("scale_pos", j);
+				button.putClientProperty("scale_name", reversedScale[i - 1]);
+				button.putClientProperty("checked", false);
+
 
 				if (i % 2 == 0) {
 					
@@ -240,7 +274,11 @@ public class MainContoller {
 					@Override
 					public void mouseClicked(MouseEvent e) {
 
-						System.out.println(button.getClientProperty("pos"));
+
+//						System.out.println(button.getClientProperty("scale_pos"));
+//						System.out.println(button.getClientProperty("scale_name"));
+//						System.out.println(button.getClientProperty("checked"));
+						
 
 						String pos = (String) button.getClientProperty("pos");
 
@@ -248,6 +286,7 @@ public class MainContoller {
 
 							button.setBackground(new Color(0xC90033));
 							button.setForeground(Color.white);
+							button.putClientProperty("checked", true);
 							new Thread(() -> playVstSound(button.getText())).start();
 
 						} else if (e.getButton() == MouseEvent.BUTTON3) {
@@ -263,15 +302,17 @@ public class MainContoller {
 								button.setForeground(new Color(0xB6C3CF));
 
 							}
-
+							
+							button.putClientProperty("checked", false);
 							 
-
 						}
+				
 
 					}
 				});
+				
 				midiRightArea.add(button);
-
+				midiLabels.add(button);
 				midiPosX += 50;
 
 			}
@@ -282,23 +323,60 @@ public class MainContoller {
 
 		JScrollPane midiScrollPane = setJScrollPane(midiRightArea, 1);
 		midiScrollPane.setBounds(50, 0, screenWidth - 66, 650);
-
 		midiArea.add(midiScrollPane);
 
+		
+		
 		// 중단 악보영역
 		JPanel scoreArea = new JPanel();
 		scoreArea.setBackground(new Color(0x123456)); // 회색 배경
 		scoreArea.add(new JLabel("악보"));
 
+		
+		
+		
 		// 하단 플레이바
 		JPanel playBarArea = new JPanel();
-		playBarArea.setBackground(new Color(0x999999)); // 짙은 회색 배경
-		playBarArea.add(new JLabel("플레이바"));
+		playBarArea.setBackground(new Color(0xfafafa)); // 짙은 회색 배경
 		playBarArea.setPreferredSize(new Dimension(1920, 50));
+		playBarArea.setLayout(new GridLayout());
+		playBarArea.setBounds(0, 650, screenWidth, 50);
+		
+		
+		// 하단 플레이바 버튼
+		
+		String[] btns = {"prev","play","pause","stop","next"};
+		JButton[] buttonArray = new JButton[btns.length];
+		
+		for (int i = 0; i < btns.length; i++) {
+
+			buttonArray[i] = new JButton(btns[i]);
+			buttonArray[i].setBackground(new Color(0x333333));
+			buttonArray[i].setForeground(new Color(0xffffff));
+			buttonArray[i].setBorderPainted(false);
+			buttonArray[i].setFocusPainted(false);
+
+			// 플레이바 영역에 버튼 추가
+			playBarArea.add(buttonArray[i]);
+
+		}
+		
+		buttonArray[1].addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				playSelectedNotes();
+				
+			}
+		});
+
+	
+		
 
 		wrap.add(midiArea);
-		// wrap.add(scoreArea);
-		// wrap.add(playBarArea);
+		//wrap.add(scoreArea);
+		wrap.add(playBarArea);
 
 		c.add(setJScrollPane(wrap, 1));
 
@@ -308,40 +386,108 @@ public class MainContoller {
 
 		// 화면 갱신
 		frame.revalidate();
-		// frame.repaint();
+		//frame.repaint();
 
 	}
 
-	public JLabel createMidiLabels(JPanel p) {
+//	public JLabel createMidiLabels(JPanel p) {
+//
+//		JLabel button = null;
+//		int midiPosX = 0;
+//		int midiPosY = 50;
+//
+//		for (int i = 1; i <= 29; i++) {
+//
+//			midiPosX = 0;
+//
+//			for (int j = 1; j <= 256; j++) {
+//				button = new JLabel(reversedScale[i - 1]);
+//				button.setFont(customFont);
+//				button.setOpaque(true);
+//				button.setBorder(BorderFactory.createLineBorder(new Color(0xB0B4B8), 1));
+//				button.setBounds(midiPosX, midiPosY, 50, 20);
+//
+//				// 라벨을 리스트에 저장
+//				midiLabels.add(button);
+//				p.add(button);
+//
+//				midiPosX += 50;
+//			}
+//
+//			midiPosY += 20;
+//		}
+//
+//		return button;
+//
+//	}
+	
+	public void playSelectedNotes() {
+	
+	    
+	    List<ScaleInfo> selectedNotes = new ArrayList<>();
+	    
+	    for (JLabel button : midiLabels) {
+	    	
+	        Boolean isChecked = (Boolean) button.getClientProperty("checked");
+	        
+	        if (isChecked != null && isChecked) {
+	            int pos = (int) button.getClientProperty("scale_pos");
+	            String scale = (String) button.getClientProperty("scale_name");
+	            
+	            // ScaleInfo 객체 추가
+	    	    selectedNotes.add(new ScaleInfo(pos, scale, isChecked));
+	            
+	        }
+	    }
+	    
+	    selectedNotes.sort(Comparator.comparingInt(ScaleInfo::getScalePos));
 
-		JLabel button = null;
-		int midiPosX = 0;
-		int midiPosY = 50;
+        // 리스트 출력
+        for (ScaleInfo scale : selectedNotes) {
+        	
+            System.out.println(scale);
+            
+        }
+	   
+	   
+	   
+	   
+	   
 
-		for (int i = 1; i <= 29; i++) {
+	  
+	    
+     // 선택된 음들을 차례대로 재생
+        new Thread(() -> {
+            final int bpm = 70; 
+            int beatDuration = 60000 / bpm; // 한 박자의 길이(ms)
 
-			midiPosX = 0;
+            for (ScaleInfo n : selectedNotes) {
+                try {
+                    String note = (String) n.getScaleName();
+                    int pos = (int) n.getScalePos();
 
-			for (int j = 1; j <= 256; j++) {
-				button = new JLabel(reversedScale[i - 1]);
-				button.setFont(customFont);
-				button.setOpaque(true);
-				button.setBorder(BorderFactory.createLineBorder(new Color(0xB0B4B8), 1));
-				button.setBounds(midiPosX, midiPosY, 50, 20);
+                    // 음을 재생하는 메서드
+                    playVstSound(note);
 
-				// 라벨을 리스트에 저장
-				midiLabels.add(button);
-				p.add(button);
+                    // scalePos 값에 따라 박자 길이 결정
+                    int noteDuration = beatDuration;
+                    if (pos % 2 != 0) {  // 홀수 scalePos 값은 8분음표 (eighth note)
+                        noteDuration /= 2; // 절반 길이로 설정
+                    }
+                    
+                    // 해당 음의 재생 후 일시 정지
+                    Thread.sleep(noteDuration);
+                    
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
 
-				midiPosX += 50;
-			}
-
-			midiPosY += 20;
-		}
-
-		return button;
-
+	    
 	}
+
+
 
 	// 메뉴바 생성
 	public void createMenuBar() {
