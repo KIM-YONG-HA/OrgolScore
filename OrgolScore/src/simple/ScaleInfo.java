@@ -6,13 +6,16 @@ public class ScaleInfo {
     private String scaleName;
     private boolean checked;
 
+    public ScaleInfo() {}
+    
     public ScaleInfo(int scalePos, String scaleName, boolean checked) {
         this.scalePos = scalePos;
         this.scaleName = scaleName;
         this.checked = checked;
     }
 
-    public int getScalePos() {
+
+	public int getScalePos() {
         return scalePos;
     }
 
