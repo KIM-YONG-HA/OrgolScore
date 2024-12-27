@@ -18,7 +18,6 @@ import java.awt.event.MouseWheelListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +36,9 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class MainContoller {
 
@@ -152,18 +154,18 @@ public class MainContoller {
 	public void createWorkSpaceFrame() {
 
 		c.removeAll();
-		c.setBackground(new Color(0xffffff));
+		c.setBackground(null);
 
 		// wrapper 스크롤
 		JPanel wrap = new JPanel();
 		wrap.setLayout(null);
 		wrap.setBounds(0, 0, screenWidth, screenHeight);
-		wrap.setBackground(Color.gray);
+		wrap.setBackground(new Color(0xffffff));
 
 		// 상단
 		JPanel midiArea = new JPanel();
 		midiArea.setLayout(null);
-		midiArea.setBackground(new Color(0xFFFFcc));
+		midiArea.setBackground(new Color(0xffffff));
 		midiArea.setBounds(0, 0, screenWidth, 650);
 
 		JPanel midiLeftArea = new JPanel();
@@ -200,7 +202,7 @@ public class MainContoller {
 		
 		
 		JPanel midiRightArea = new JPanel();
-		midiRightArea.setBackground(new Color(0xabcabc));
+		//midiRightArea.setBackground(new Color(0xabcabc));
 		midiRightArea.setLayout(null);
 		
 		// 마디 및 박자 출력 
@@ -214,7 +216,7 @@ public class MainContoller {
 			measure.setBounds(400 * i, 0, 400, 25);
 			measure.setOpaque(true);
 			measure.setBackground(new Color(0xffffff));
-			
+			//measure.setForeground(new Color(0xffffff));
 			measure.setBorder(BorderFactory.createLineBorder(new Color(0xcccccc), 1));
 			midiRightArea.add(measure);
 			
@@ -368,14 +370,14 @@ public class MainContoller {
 		// 하단 플레이바
 		JPanel playBarArea = new JPanel();
 		playBarArea.setBackground(new Color(0xfafafa));
-		playBarArea.setPreferredSize(new Dimension(1920, 50));
+		//playBarArea.setPreferredSize(new Dimension(1920, 50));
 		playBarArea.setLayout(new GridLayout());
 		playBarArea.setBounds(0, 650, screenWidth, 50);
 		
 		
 		// 하단 플레이바 버튼
 		
-		String[] btns = {"prev","play","pause","stop","next"};
+		String[] btns = {"< prev","▶ play","|| pause","■ stop","next > "};
 		JButton[] buttonArray = new JButton[btns.length];
 		
 		for (int i = 0; i < btns.length; i++) {
@@ -394,14 +396,12 @@ public class MainContoller {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
+				
 				playSelectedNotes();
 				
 			}
 		});
 
-	
-		
 
 		wrap.add(midiArea);
 		//wrap.add(scoreArea);
@@ -409,11 +409,6 @@ public class MainContoller {
 
 		c.add(setJScrollPane(wrap, 1));
 
-		// long startTime = System.currentTimeMillis();
-		// long endTime = System.currentTimeMillis();
-		// System.out.println( (endTime - startTime) + " ms");
-
-		// 화면 갱신
 		frame.revalidate();
 		//frame.repaint();
 
@@ -450,105 +445,146 @@ public class MainContoller {
 //
 //	}
 	
-	public void playSelectedNotes() {
+	
+	
+	
+	public void playTrueNotes(JSONArray measures, int bpm) {
+	    int beatDuration = 60000 / bpm; // 한 박자의 길이 (밀리초)
 
-		List<ScaleInfo> selectedNotes = new ArrayList<>();
+	    // Measure 순회
+	    for (int i = 0; i < measures.length(); i++) {
+	        JSONArray measure = measures.getJSONArray(i);
 
-		for (JLabel button : midiLabels) {
+	        // Measure 내부의 Note 순회
+	        for (int j = 0; j < measure.length(); j++) {
+	            JSONObject noteObj = measure.getJSONObject(j);
 
-			Boolean isChecked = (Boolean) button.getClientProperty("checked");
+	            String note = noteObj.getString("note");
+	            boolean isChecked = noteObj.getBoolean("checked");
 
-			if (isChecked != null && isChecked) {
-			int pos = (int) button.getClientProperty("scale_pos");
-			String scale = (String) button.getClientProperty("scale_name");
-
-			// ScaleInfo 객체 추가
-			selectedNotes.add(new ScaleInfo(pos, scale, isChecked));
-
-			}
-		}
-
-		selectedNotes.sort(Comparator.comparingInt(ScaleInfo::getScalePos));
-
-		// 리스트 출력
-		for (ScaleInfo scale : selectedNotes) {
-
-			System.out.println(scale);
-
-		}
-	   
-
-	  
-	    
-     // 선택된 음들을 차례대로 재생
-        new Thread(() -> {
-            final int bpm = 60; 
-            int beatDuration = 60000 / bpm / 2; // 
-
-            for (ScaleInfo n : selectedNotes) {
-                try {
-                    String note = n.getScaleName();
-                    int pos = n.getScalePos();
-                    boolean isChecked = n.isChecked();
-
-                	playVstSound(note);
-                    Thread.sleep(beatDuration);
-                    
-                   
-                    
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-		
-		
-		
+	            // checked가 true인 경우만 재생
+	            if (isChecked) {
+	                playVstSound(note); // 음표 재생
+	                try {
+	                    Thread.sleep(beatDuration); // BPM에 따라 대기
+	                } catch (InterruptedException e) {
+	                    e.printStackTrace();
+	                }
+	            }
+	        }
+	    }
 	}
+
 	
-	
-	
-	
-	
-	
+
 	// 체크된 음원 json화
-//    public void playSelectedNotes() {
-//    	
-//        JSONArray selectedNotesArray = new JSONArray();
+    public void playSelectedNotes() {
+    	
+        JSONArray selectedNotesArray = new JSONArray();
+
+        for (JLabel button : midiLabels) {
+        	
+        	int scalePos = (int) button.getClientProperty("scale_pos");
+        	String scaleName = (String) button.getClientProperty("scale_name");
+            boolean isChecked = (boolean) button.getClientProperty("checked");
+
+            if (isChecked) {
+            	
+                JSONObject noteObject = new JSONObject();
+                noteObject.put("scale_name", scaleName);
+                noteObject.put("scale_pos", scalePos);
+                selectedNotesArray.put(noteObject);
+                
+            }
+        }
+        
+
+        
+        JSONObject json = new JSONObject();
+        json.put("selected_notes", selectedNotesArray);
+
+        // JSON 데이터를 출력 (디버깅용)
+        System.out.println(json.toString(4));
+
+        
+        // 이제 이 JSON 데이터를 기반으로 음원 재생
+        // 새로운 쓰레드에서 음원 재생을 시작
+        //new Thread(() -> playNotesFromJson(json)).start();
+        
+        
+    }
+	
+	
+//	public void currentMeasureDisplay() {
+//	
+//		System.out.println(midiLabels.size());
+//		System.out.println(midiLabels.get(0).getText());
+//		
+//	}
+//	
+	
+	
+	
+	
+	
+//	
+//	public void playSelectedNotes() {
 //
-//        for (JLabel button : midiLabels) {
-//        	
-//        	int scalePos = (int) button.getClientProperty("scale_pos");
-//        	String scaleName = (String) button.getClientProperty("scale_name");
-//            boolean isChecked = (boolean) button.getClientProperty("checked");
+//		List<ScaleInfo> selectedNotes = new ArrayList<>();
 //
-//            if (isChecked) {
-//            	
-//                JSONObject noteObject = new JSONObject();
-//                noteObject.put("scale_name", scaleName);
-//                noteObject.put("scale_pos", scalePos);
-//                selectedNotesArray.put(noteObject);
-//                
+//		for (JLabel button : midiLabels) {
+//
+//			Boolean isChecked = (Boolean) button.getClientProperty("checked");
+//
+//			if (isChecked != null && isChecked) {
+//			int pos = (int) button.getClientProperty("scale_pos");
+//			String scale = (String) button.getClientProperty("scale_name");
+//
+//			// ScaleInfo 객체 추가
+//			selectedNotes.add(new ScaleInfo(pos, scale, isChecked));
+//
+//			}
+//		}
+//
+//		selectedNotes.sort(Comparator.comparingInt(ScaleInfo::getScalePos));
+//
+//		// 리스트 출력
+//		for (ScaleInfo scale : selectedNotes) {
+//
+//			System.out.println(scale);
+//
+//		}
+//	   
+//     // 선택된 음들을 차례대로 재생
+//        new Thread(() -> {
+//            final int bpm = 60; 
+//            int beatDuration = 60000 / bpm / 2; // 
+//
+//            for (ScaleInfo n : selectedNotes) {
+//                try {
+//                    String note = n.getScaleName();
+//                    int pos = n.getScalePos();
+//                    boolean isChecked = n.isChecked();
+//
+//                	playVstSound(note);
+//                    Thread.sleep(beatDuration);
+//                    
+//                   
+//                    
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
 //            }
-//        }
-//        
-//        
-//
-//        
-//        JSONObject json = new JSONObject();
-//        json.put("selected_notes", selectedNotesArray);
-//
-//        // JSON 데이터를 출력 (디버깅용)
-//        System.out.println(json.toString(4));
-//
-//  
-//        
-//        // 이제 이 JSON 데이터를 기반으로 음원 재생
-//        // 새로운 쓰레드에서 음원 재생을 시작
-//        //new Thread(() -> playNotesFromJson(json)).start();
-//        
-//        
-//    }
+//        }).start();
+//		
+//		
+//	}
+//	
+	
+	
+	
+	
+	
 
     // 음원 재생
 //    private void playNotesFromJson(JSONObject json) {
