@@ -1,0 +1,154 @@
+{
+    "notes": [
+        {
+            "index": 13,
+            "pitch": "F5"
+        },
+        {
+            "index": 11,
+            "pitch": "E5"
+        },
+        {
+            "index": 14,
+            "pitch": "E5"
+        },
+        {
+            "index": 27,
+            "pitch": "E5"
+        },
+        {
+            "index": 7,
+            "pitch": "D5"
+        },
+        {
+            "index": 10,
+            "pitch": "D5"
+        },
+        {
+            "index": 17,
+            "pitch": "D5"
+        },
+        {
+            "index": 18,
+            "pitch": "D5"
+        },
+        {
+            "index": 3,
+            "pitch": "C5"
+        },
+        {
+            "index": 6,
+            "pitch": "C5"
+        },
+        {
+            "index": 9,
+            "pitch": "C5"
+        },
+        {
+            "index": 11,
+            "pitch": "C5"
+        },
+        {
+            "index": 19,
+            "pitch": "C5"
+        },
+        {
+            "index": 21,
+            "pitch": "C5"
+        },
+        {
+            "index": 22,
+            "pitch": "C5"
+        },
+        {
+            "index": 27,
+            "pitch": "C5"
+        },
+        {
+            "index": 5,
+            "pitch": "B4"
+        },
+        {
+            "index": 7,
+            "pitch": "B4"
+        },
+        {
+            "index": 23,
+            "pitch": "B4"
+        },
+        {
+            "index": 26,
+            "pitch": "B4"
+        },
+        {
+            "index": 15,
+            "pitch": "A4"
+        },
+        {
+            "index": 25,
+            "pitch": "A4"
+        },
+        {
+            "index": 1,
+            "pitch": "G4"
+        },
+        {
+            "index": 3,
+            "pitch": "G4"
+        },
+        {
+            "index": 7,
+            "pitch": "G4"
+        },
+        {
+            "index": 11,
+            "pitch": "G4"
+        },
+        {
+            "index": 19,
+            "pitch": "G4"
+        },
+        {
+            "index": 23,
+            "pitch": "G4"
+        },
+        {
+            "index": 15,
+            "pitch": "F4"
+        },
+        {
+            "index": 3,
+            "pitch": "E4"
+        },
+        {
+            "index": 11,
+            "pitch": "E4"
+        },
+        {
+            "index": 7,
+            "pitch": "D4"
+        },
+        {
+            "index": 23,
+            "pitch": "D4"
+        },
+        {
+            "index": 3,
+            "pitch": "C4"
+        },
+        {
+            "index": 15,
+            "pitch": "C4"
+        },
+        {
+            "index": 19,
+            "pitch": "C4"
+        },
+        {
+            "index": 27,
+            "pitch": "C4"
+        }
+    ],
+    "tempo": 120,
+    "title": "Custom Score"
+}

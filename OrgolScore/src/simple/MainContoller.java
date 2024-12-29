@@ -65,17 +65,14 @@ public class MainContoller {
 	};
 	private String[] reversedScale = new String[scale.length];
 	private List<JLabel> midiLabels = new ArrayList<>();
-	//private Map<String, Clip> soundCache = new HashMap<>();
 	
-	
-	private int currentColumn = 0; // 현재 열 위치
-	private boolean isPaused = false; // 일시정지 상태
-	private Timer timer; // Swing Timer 객체
+	private Timer timer; 
+	private boolean isPaused = false;
+	private int currentColumn = 0; 
 	private final int totalColumns = 256; // 총 열의 개수
 	private final int totalRows = 29; // 총 행의 개수
 	private final int columnDuration = 500; // 열 재생 시간 (밀리초)
 
-	
 	
 	// 메인 컨트롤러 
 	public MainContoller() {
@@ -164,20 +161,17 @@ public class MainContoller {
 
 		c.removeAll();
 		
-		
-		
 		// 메뉴바 설정
 		JMenuBar menuBar = createMenuBar();
 		frame.setJMenuBar(menuBar);
 		
-	
-	
 		// wrapper 스크롤
 		JPanel wrap = new JPanel();
 		wrap.setLayout(null);
 		wrap.setBounds(0, 0, screenWidth, screenHeight);
 		wrap.setBackground(new Color(0xffffff));
 
+		
 		// 플레이바 생성 
 		createPlayBarArea(wrap);
 		
@@ -188,6 +182,7 @@ public class MainContoller {
 		
 		frame.revalidate();
 		frame.repaint();
+		
 	}
 	
 	
@@ -236,11 +231,11 @@ public class MainContoller {
 		    public void actionPerformed(ActionEvent e) {
 		        System.out.println("next");
 		        if (timer != null) {
-		            timer.stop(); // 타이머 정지
+		            timer.stop();
 		        }
 		        if (currentColumn < totalColumns - 1) {
-		            currentColumn++; // 다음 열로 이동
-		            highlightColumn(); // 현재 열 강조
+		            currentColumn++;
+		            highlightColumn();
 		        }
 		    }
 		});
@@ -251,7 +246,7 @@ public class MainContoller {
 		        System.out.println("play");
 		        if (timer == null || !timer.isRunning()) {
 		            isPaused = false;
-		            startPlayback(); // 재생 시작
+		            startPlayback();
 		        }
 		    }
 		});
@@ -262,7 +257,7 @@ public class MainContoller {
 		    public void actionPerformed(ActionEvent e) {
 		        System.out.println("pause");
 		        if (timer != null && timer.isRunning()) {
-		            timer.stop(); // 타이머 정지
+		            timer.stop();
 		            isPaused = true;
 		        }
 		    }
@@ -273,16 +268,17 @@ public class MainContoller {
 		    public void actionPerformed(ActionEvent e) {
 		        System.out.println("stop");
 		        if (timer != null) {
-		            timer.stop(); // 타이머 종료
+		            timer.stop();
 		        }
-		        currentColumn = 0; // 처음으로 초기화
-		        resetAllLabels(); // 모든 라벨 색상 복구
+		        currentColumn = 0;
+		        resetAllLabels();
 		    }
 		});
 		
 		wrap.add(playBarArea);
 		
 	}
+	
 
 	// 미디 영역 생성 
 	public void createMidiArea(JPanel wrap) {
@@ -457,7 +453,6 @@ public class MainContoller {
 
 		midiArea.add(midiScrollPane);
 		
-		
 		wrap.add(midiArea);
 
 	}
@@ -469,9 +464,8 @@ public class MainContoller {
 	    final int totalRows = 29; // 총 행의 개수
 	    final int columnDuration = 500; // 각 열 재생 시간 (밀리초)
 
-	    // Swing Timer 사용
-	    javax.swing.Timer timer = new javax.swing.Timer(columnDuration, null);
-	    final int[] currentColumn = {0}; // 현재 열을 추적하는 변수
+	    Timer timer = new Timer(columnDuration, null);
+	    final int[] currentColumn = {0}; 
 
 	    timer.addActionListener(e -> {
 	        // 모든 열이 끝나면 타이머 중지
@@ -574,6 +568,7 @@ public class MainContoller {
 
 	// 미디 라벨 리셋
 	private void resetAllLabels() {
+		
 	    for (int i = 0; i < totalRows; i++) {
 	        for (int j = 0; j < totalColumns; j++) {
 	            int index = i * totalColumns + j;
@@ -595,6 +590,7 @@ public class MainContoller {
 	            }
 	        }
 	    }
+	    
 	}
 
 	
@@ -621,9 +617,7 @@ public class MainContoller {
 	        fileMenu.add(exportMidiItem);
 	        fileMenu.addSeparator();
 	        fileMenu.add(exitItem);
-
 	        menuBar.add(fileMenu);
-
 	        
 	        
 	        
@@ -631,46 +625,50 @@ public class MainContoller {
 	        importMidiItem.addActionListener(e -> importScore());
 	        exportMidiItem.addActionListener(e -> exportScore());
 
-	        exitItem.addActionListener(e -> System.exit(0)); // 프로그램 종료
+	        exitItem.addActionListener(e -> System.exit(0)); 
 
 	        return menuBar;
 	    }
 	
 	 
 	 private void handleNewFile() {
-		    boolean hasCheckedLabels = midiLabels.stream()
-		        .anyMatch(label -> Boolean.TRUE.equals(label.getClientProperty("checked")));
+		 
+		    boolean hasCheckedLabels = midiLabels.stream().anyMatch(label -> Boolean.TRUE.equals(label.getClientProperty("checked")));
 
 		    if (hasCheckedLabels) {
 		        int result = JOptionPane.showConfirmDialog(
 		            frame,
 		            "작업 중인 내역이 있습니다. 저장하시겠습니까?",
 		            "확인",
-		            JOptionPane.YES_NO_CANCEL_OPTION, // 예/아니오/취소 모두 표시
+		            JOptionPane.YES_NO_CANCEL_OPTION, // 예/아니오/취소
 		            JOptionPane.WARNING_MESSAGE
 		        );
 
 		        if (result == JOptionPane.YES_OPTION) {
-		            exportScore(); // JSON으로 저장
-		            resetAllLabels(); // 저장 후 초기화
+		        	
+		            exportScore(); 
+		            resetAllLabels(); 
 		            System.out.println("새 작업 시작");
+		            
 		        } else if (result == JOptionPane.NO_OPTION) {
-		            resetAllLabels(); // 저장 없이 초기화
-		            System.out.println("라벨 초기화 후 새 작업 시작");
+		        	
+		            resetAllLabels();
+		            System.out.println("라벨 초기화 , 새 작업 시작");
+		            
 		        } else if (result == JOptionPane.CANCEL_OPTION) {
+		        	
 		            System.out.println("작업 취소");
-		            // 취소 시 아무 동작도 하지 않음
+		            
 		        }
+		        
 		    } else {
+		    	
 		        resetAllLabels(); // 선택된 라벨이 없으면 바로 초기화
 		        System.out.println("새 작업 시작");
+		        
 		    }
 		}
 
-	 
-	 
-	 
-	 
 	 
 	 
 	// 타이틀 바 생성
@@ -840,12 +838,14 @@ public class MainContoller {
 	            fileWriter.write(jsonScore.toString(4)); // JSON 들여쓰기
 	            fileWriter.close();
 
-	            System.out.println("악보가 JSON 파일로 저장되었습니다: " + selectedFile.getAbsolutePath());
+	            System.out.println("악보가 JSON 파일로 저장: " + selectedFile.getAbsolutePath());
 	        }
 
 	    } catch (Exception e) {
+	    	
 	        e.printStackTrace();
-	        System.out.println("JSON 파일을 저장하는 데 실패했습니다.");
+	        System.out.println("JSON 파일 저장 실패.");
+	        
 	    }
 	}
 	
