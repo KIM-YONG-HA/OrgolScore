@@ -1,6 +1,5 @@
 package simple;
 
-
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -47,6 +46,7 @@ import javax.swing.border.LineBorder;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
 public class MainContoller {
 
 	private JFrame frame;
@@ -59,36 +59,33 @@ public class MainContoller {
 	private JPanel mainPanel;
 	private JPanel workSpacePanel;
 
-	private String[] scale = {
-			"C3", "D3", "G3", "A3", "B3", "C4", "D4", "E4", "F4", "F#4", "G4", "G#4", "A4", "A#4", "B4", "C5", "C#5",
-			"D5", "D#5", "E5", "F5", "G5", "G#5", "A5", "A#5", "B5", "C6", "D6", "E6"
-	};
+	private String[] scale = { "C3", "D3", "G3", "A3", "B3", "C4", "D4", "E4", "F4", "F#4", "G4", "G#4", "A4", "A#4",
+			"B4", "C5", "C#5", "D5", "D#5", "E5", "F5", "G5", "G#5", "A5", "A#5", "B5", "C6", "D6", "E6" };
 	private String[] reversedScale = new String[scale.length];
 	private List<JLabel> midiLabels = new ArrayList<>();
-	
-	private Timer timer; 
+
+	private Timer timer;
 	private boolean isPaused = false;
-	private int currentColumn = 0; 
+	private int currentColumn = 0;
 	private final int totalColumns = 256; // 총 열의 개수
 	private final int totalRows = 29; // 총 행의 개수
 	private final int columnDuration = 500; // 열 재생 시간 (밀리초)
 
-	
-	// 메인 컨트롤러 
+	// 메인 컨트롤러
 	public MainContoller() {
 
 		frame = new JFrame();
 		c = frame.getContentPane();
 		createMainFrame();
 
-		//preloadSounds();
+		// preloadSounds();
 
-		 // reversedScale 초기화
-	    reversedScale = new String[scale.length];
-	    for (int i = 0; i < scale.length; i++) {
-	        reversedScale[i] = scale[scale.length - 1 - i];
-	    }
-	    
+		// reversedScale 초기화
+		reversedScale = new String[scale.length];
+		for (int i = 0; i < scale.length; i++) {
+			reversedScale[i] = scale[scale.length - 1 - i];
+		}
+
 		customFont = setCustomFont("PretendardVariable", 14);
 
 		Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -97,31 +94,28 @@ public class MainContoller {
 		screenHeight = screenSize.height;
 
 		for (int i = 0; i < scale.length; i++) {
-			
+
 			reversedScale[i] = scale[scale.length - 1 - i];
-			
+
 		}
 
 	}
 
-	// 메인 프레임 생성 
+	// 메인 프레임 생성
 	public void createMainFrame() {
-		
+
 		frame.setTitle("Orgol Score");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(screenWidth, screenHeight);
-		frame.setLocation(0,0);
-		
-		//frame.setUndecorated(true); // 타이틀 바 제거
-		frame.setExtendedState(JFrame.MAXIMIZED_BOTH); // 최대화
-		//frame.setLocationRelativeTo(null);
+		frame.setLocation(0, 0);
 
-		       
-       
+		// frame.setUndecorated(true); // 타이틀 바 제거
+		frame.setExtendedState(JFrame.MAXIMIZED_BOTH); // 최대화
+		// frame.setLocationRelativeTo(null);
+
 		c.setBackground(new Color(0x0560EB));
 		c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
 
-		
 		JLabel label = new JLabel("오스 :: ORGOL SCORE", SwingConstants.CENTER);
 		label.setFont(setCustomFont("CookieRunBold", 50));
 		label.setForeground(new Color(0xffffff));
@@ -136,7 +130,7 @@ public class MainContoller {
 		startButton.setMargin(new Insets(5, 15, 5, 15));
 		startButton.setForeground(new Color(0x333));
 
-		// 워크스페이스 전환 이벤트 
+		// 워크스페이스 전환 이벤트
 		startButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -145,7 +139,7 @@ public class MainContoller {
 
 			}
 		});
-		
+
 		c.add(Box.createVerticalGlue());
 		c.add(label);
 		c.add(Box.createVerticalStrut(20));
@@ -156,50 +150,46 @@ public class MainContoller {
 
 	}
 
-	// 워크스페이스 프레임 생성 
+	// 워크스페이스 프레임 생성
 	public void createWorkSpaceFrame() {
 
 		c.removeAll();
-		
+
 		// 메뉴바 설정
 		JMenuBar menuBar = createMenuBar();
 		frame.setJMenuBar(menuBar);
-		
+
 		// wrapper 스크롤
 		JPanel wrap = new JPanel();
 		wrap.setLayout(null);
 		wrap.setBounds(0, 0, screenWidth, screenHeight);
 		wrap.setBackground(new Color(0xffffff));
 
-		
-		// 플레이바 생성 
+		// 플레이바 생성
 		createPlayBarArea(wrap);
-		
-		// 미디 영역 생성 
+
+		// 미디 영역 생성
 		createMidiArea(wrap);
-		//setPachelbelCanon();
+		// setPachelbelCanon();
 		c.add(setJScrollPane(wrap, 1));
-		
+
 		frame.revalidate();
 		frame.repaint();
-		
+
 	}
-	
-	
-	
-	
-	// 플레이바 생성 
+
+	// 플레이바 생성
 	public void createPlayBarArea(JPanel wrap) {
-		
+
 		JPanel playBarArea = new JPanel();
-		//playBarArea.setPreferredSize(new Dimension(screenWidth, 50));
+		// playBarArea.setPreferredSize(new Dimension(screenWidth, 50));
 		playBarArea.setBackground(Color.red);
 		playBarArea.setLayout(new GridLayout());
 		playBarArea.setBounds(0, 0, screenWidth, 50);
-		
-		String[] btns = {"< prev","next > ","▶ play","|| pause","■ stop"};
+
+		String[] btns = { "< prev", "next > ", "▶ play", "|| pause", "■ stop" };
 		JButton[] buttonArray = new JButton[btns.length];
-		
+
 		for (int i = 0; i < btns.length; i++) {
 
 			buttonArray[i] = new JButton(btns[i]);
@@ -213,76 +203,74 @@ public class MainContoller {
 		}
 
 		buttonArray[0].addActionListener(new ActionListener() { // Prev
-		    @Override
-		    public void actionPerformed(ActionEvent e) {
-		        System.out.println("prev");
-		        if (timer != null) {
-		            timer.stop(); // 타이머 정지
-		        }
-		        if (currentColumn > 0) {
-		            currentColumn--; // 이전 열로 이동
-		            highlightColumn(); // 현재 열 강조
-		        }
-		    }
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("prev");
+				if (timer != null) {
+					timer.stop(); // 타이머 정지
+				}
+				if (currentColumn > 0) {
+					currentColumn--; // 이전 열로 이동
+					highlightColumn(); // 현재 열 강조
+				}
+			}
 		});
 
 		buttonArray[1].addActionListener(new ActionListener() { // Next
-		    @Override
-		    public void actionPerformed(ActionEvent e) {
-		        System.out.println("next");
-		        if (timer != null) {
-		            timer.stop();
-		        }
-		        if (currentColumn < totalColumns - 1) {
-		            currentColumn++;
-		            highlightColumn();
-		        }
-		    }
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("next");
+				if (timer != null) {
+					timer.stop();
+				}
+				if (currentColumn < totalColumns - 1) {
+					currentColumn++;
+					highlightColumn();
+				}
+			}
 		});
 
 		buttonArray[2].addActionListener(new ActionListener() { // Play
-		    @Override
-		    public void actionPerformed(ActionEvent e) {
-		        System.out.println("play");
-		        if (timer == null || !timer.isRunning()) {
-		            isPaused = false;
-		            startPlayback();
-		        }
-		    }
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("play");
+				if (timer == null || !timer.isRunning()) {
+					isPaused = false;
+					startPlayback();
+				}
+			}
 		});
 
-
 		buttonArray[3].addActionListener(new ActionListener() { // Pause
-		    @Override
-		    public void actionPerformed(ActionEvent e) {
-		        System.out.println("pause");
-		        if (timer != null && timer.isRunning()) {
-		            timer.stop();
-		            isPaused = true;
-		        }
-		    }
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("pause");
+				if (timer != null && timer.isRunning()) {
+					timer.stop();
+					isPaused = true;
+				}
+			}
 		});
 
 		buttonArray[4].addActionListener(new ActionListener() { // Stop
-		    @Override
-		    public void actionPerformed(ActionEvent e) {
-		        System.out.println("stop");
-		        if (timer != null) {
-		            timer.stop();
-		        }
-		        currentColumn = 0;
-		        resetAllLabels();
-		    }
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("stop");
+				if (timer != null) {
+					timer.stop();
+				}
+				currentColumn = 0;
+				resetAllLabels();
+			}
 		});
-		
-		wrap.add(playBarArea);
-		
-	}
-	
 
-	// 미디 영역 생성 
+		wrap.add(playBarArea);
+
+	}
+
+	// 미디 영역 생성
 	public void createMidiArea(JPanel wrap) {
-		
+
 		JPanel midiArea = new JPanel();
 		midiArea.setLayout(null);
 		midiArea.setBackground(new Color(0xEEEEEE));
@@ -296,7 +284,7 @@ public class MainContoller {
 		// 스케일 출력
 		int x = 0;
 		int y = 0;
-		
+
 		for (int i = scale.length - 1; i >= 0; i--) {
 			JLabel scaleLabel = new JLabel(scale[i], SwingConstants.CENTER);
 			scaleLabel.setFont(customFont);
@@ -342,8 +330,6 @@ public class MainContoller {
 				defX += 100;
 			}
 		}
-
-
 
 		// 미디 라벨 생성
 		int midiPosX = 0;
@@ -427,8 +413,6 @@ public class MainContoller {
 
 		}
 
-
-		
 		// 미디 영역 스크롤
 		JScrollPane midiScrollPane = new JScrollPane(midiRightArea);
 		midiScrollPane.setBounds(50, 50, screenWidth - 66, 650);
@@ -452,227 +436,214 @@ public class MainContoller {
 		});
 
 		midiArea.add(midiScrollPane);
-		
+
 		wrap.add(midiArea);
 
 	}
-	
-	
+
 	// 현재 재생 중 위치 표시
 	public void currentMeasureDisplay() {
-	    final int totalColumns = 256; // 총 열의 개수
-	    final int totalRows = 29; // 총 행의 개수
-	    final int columnDuration = 500; // 각 열 재생 시간 (밀리초)
+		final int totalColumns = 256; // 총 열의 개수
+		final int totalRows = 29; // 총 행의 개수
+		final int columnDuration = 500; // 각 열 재생 시간 (밀리초)
 
-	    Timer timer = new Timer(columnDuration, null);
-	    final int[] currentColumn = {0}; 
+		Timer timer = new Timer(columnDuration, null);
+		final int[] currentColumn = { 0 };
 
-	    timer.addActionListener(e -> {
-	        // 모든 열이 끝나면 타이머 중지
-	        if (currentColumn[0] >= totalColumns) {
-	            timer.stop();
-	            return;
-	        }
+		timer.addActionListener(e -> {
+			// 모든 열이 끝나면 타이머 중지
+			if (currentColumn[0] >= totalColumns) {
+				timer.stop();
+				return;
+			}
 
-	        // 이전 열 복구
-	        if (currentColumn[0] > 0) {
-	            for (int row = 0; row < totalRows; row++) {
-	                int prevLabelIndex = row * totalColumns + (currentColumn[0] - 1);
-	                JLabel prevLabel = midiLabels.get(prevLabelIndex);
-	                String pos = (String) prevLabel.getClientProperty("pos");
+			// 이전 열 복구
+			if (currentColumn[0] > 0) {
+				for (int row = 0; row < totalRows; row++) {
+					int prevLabelIndex = row * totalColumns + (currentColumn[0] - 1);
+					JLabel prevLabel = midiLabels.get(prevLabelIndex);
+					String pos = (String) prevLabel.getClientProperty("pos");
 
-	                if ("odd".equals(pos)) {
-	                    prevLabel.setBackground(new Color(0xECF0F5)); // odd color
-	                    prevLabel.setForeground(new Color(0xECF0F5));
-	                } else {
-	                    prevLabel.setBackground(new Color(0xB6C3CF)); // even color
-	                    prevLabel.setForeground(new Color(0xB6C3CF));
-	                }
+					if ("odd".equals(pos)) {
+						prevLabel.setBackground(new Color(0xECF0F5)); // odd color
+						prevLabel.setForeground(new Color(0xECF0F5));
+					} else {
+						prevLabel.setBackground(new Color(0xB6C3CF)); // even color
+						prevLabel.setForeground(new Color(0xB6C3CF));
+					}
 
-	                // 체크 상태 복구
-	                Boolean isChecked = (Boolean) prevLabel.getClientProperty("checked");
-	                if (Boolean.TRUE.equals(isChecked)) {
-	                    prevLabel.setBackground(new Color(0xC90033)); // checked 색상
-	                    prevLabel.setForeground(Color.WHITE);
-	                }
-	            }
-	        }
+					// 체크 상태 복구
+					Boolean isChecked = (Boolean) prevLabel.getClientProperty("checked");
+					if (Boolean.TRUE.equals(isChecked)) {
+						prevLabel.setBackground(new Color(0xC90033)); // checked 색상
+						prevLabel.setForeground(Color.WHITE);
+					}
+				}
+			}
 
-	        // 현재 열 색상 변경 및 음 실행
-	        for (int row = 0; row < totalRows; row++) {
-	            int labelIndex = row * totalColumns + currentColumn[0];
-	            JLabel currentLabel = midiLabels.get(labelIndex);
+			// 현재 열 색상 변경 및 음 실행
+			for (int row = 0; row < totalRows; row++) {
+				int labelIndex = row * totalColumns + currentColumn[0];
+				JLabel currentLabel = midiLabels.get(labelIndex);
 
-	            Boolean isChecked = (Boolean) currentLabel.getClientProperty("checked");
-	            if (Boolean.TRUE.equals(isChecked)) {
-	                currentLabel.setBackground(new Color(0xC90033)); // checked 색상
-	                currentLabel.setForeground(Color.WHITE);
+				Boolean isChecked = (Boolean) currentLabel.getClientProperty("checked");
+				if (Boolean.TRUE.equals(isChecked)) {
+					currentLabel.setBackground(new Color(0xC90033)); // checked 색상
+					currentLabel.setForeground(Color.WHITE);
 
-	                String scaleName = (String) currentLabel.getClientProperty("scale_name");
-	                new Thread(() -> playVstSound(scaleName)).start();
-	                
-	            } else {
-	                currentLabel.setBackground(new Color(0x333333)); // 재생 중 색상
-	                currentLabel.setForeground(new Color(0x333333)); // 글자색
-	            }
-	        }
+					String scaleName = (String) currentLabel.getClientProperty("scale_name");
+					new Thread(() -> playVstSound(scaleName)).start();
 
-	        // 다음 열로 이동
-	        currentColumn[0]++;
-	    });
+				} else {
+					currentLabel.setBackground(new Color(0x333333)); // 재생 중 색상
+					currentLabel.setForeground(new Color(0x333333)); // 글자색
+				}
+			}
 
-	    timer.start(); // 타이머 시작
+			// 다음 열로 이동
+			currentColumn[0]++;
+		});
+
+		timer.start(); // 타이머 시작
 	}
 
 	// 재생
 	private void startPlayback() {
-	    if (timer != null && timer.isRunning()) {
-	        timer.stop(); // 기존 타이머 중지
-	    }
+		if (timer != null && timer.isRunning()) {
+			timer.stop(); // 기존 타이머 중지
+		}
 
-	    timer = new javax.swing.Timer(columnDuration, e -> {
-	        if (currentColumn >= totalColumns) {
-	            timer.stop(); // 재생 종료
-	            return;
-	        }
+		timer = new javax.swing.Timer(columnDuration, e -> {
+			if (currentColumn >= totalColumns) {
+				timer.stop(); // 재생 종료
+				return;
+			}
 
-	        highlightColumn(); // 현재 열 강조 및 체크된 음 실행
-	        currentColumn++; // 다음 열로 이동
-	    });
+			highlightColumn(); // 현재 열 강조 및 체크된 음 실행
+			currentColumn++; // 다음 열로 이동
+		});
 
-	    timer.start(); // 타이머 시작
+		timer.start(); // 타이머 시작
 	}
 
-	// 재생영역 하이라이트 
+	// 재생영역 하이라이트
 	private void highlightColumn() {
-	    resetAllLabels(); // 모든 라벨 초기화
+		resetAllLabels(); // 모든 라벨 초기화
 
-	    for (int row = 0; row < totalRows; row++) {
-	        int labelIndex = row * totalColumns + currentColumn;
-	        JLabel currentLabel = midiLabels.get(labelIndex);
+		for (int row = 0; row < totalRows; row++) {
+			int labelIndex = row * totalColumns + currentColumn;
+			JLabel currentLabel = midiLabels.get(labelIndex);
 
-	        Boolean isChecked = (Boolean) currentLabel.getClientProperty("checked");
-	        if (Boolean.TRUE.equals(isChecked)) {
-	            currentLabel.setBackground(new Color(0xC90033)); // checked 색상
-	            currentLabel.setForeground(Color.WHITE);
+			Boolean isChecked = (Boolean) currentLabel.getClientProperty("checked");
+			if (Boolean.TRUE.equals(isChecked)) {
+				currentLabel.setBackground(new Color(0xC90033)); // checked 색상
+				currentLabel.setForeground(Color.WHITE);
 
-	            // 음 실행 (비동기로 동시에 실행)
-	            String scaleName = (String) currentLabel.getClientProperty("scale_name");
-	            new Thread(() -> playVstSound(scaleName)).start();
-	        } else {
-	            currentLabel.setBackground(new Color(0x333333)); // 재생 중 색상
-	            currentLabel.setForeground(new Color(0x333333)); // 글자색
-	        }
-	    }
+				// 음 실행 (비동기로 동시에 실행)
+				String scaleName = (String) currentLabel.getClientProperty("scale_name");
+				new Thread(() -> playVstSound(scaleName)).start();
+			} else {
+				currentLabel.setBackground(new Color(0x333333)); // 재생 중 색상
+				currentLabel.setForeground(new Color(0x333333)); // 글자색
+			}
+		}
 	}
 
 	// 미디 라벨 리셋
 	private void resetAllLabels() {
-		
-	    for (int i = 0; i < totalRows; i++) {
-	        for (int j = 0; j < totalColumns; j++) {
-	            int index = i * totalColumns + j;
-	            JLabel label = midiLabels.get(index);
 
-	            String pos = (String) label.getClientProperty("pos");
-	            if ("odd".equals(pos)) {
-	                label.setBackground(new Color(0xECF0F5)); // odd color
-	                label.setForeground(new Color(0xECF0F5));
-	            } else {
-	                label.setBackground(new Color(0xB6C3CF)); // even color
-	                label.setForeground(new Color(0xB6C3CF));
-	            }
+		for (int i = 0; i < totalRows; i++) {
+			for (int j = 0; j < totalColumns; j++) {
+				int index = i * totalColumns + j;
+				JLabel label = midiLabels.get(index);
 
-	            Boolean isChecked = (Boolean) label.getClientProperty("checked");
-	            if (Boolean.TRUE.equals(isChecked)) {
-	                label.setBackground(new Color(0xC90033)); // checked 색상
-	                label.setForeground(Color.WHITE);
-	            }
-	        }
-	    }
-	    
+				String pos = (String) label.getClientProperty("pos");
+				if ("odd".equals(pos)) {
+					label.setBackground(new Color(0xECF0F5)); // odd color
+					label.setForeground(new Color(0xECF0F5));
+				} else {
+					label.setBackground(new Color(0xB6C3CF)); // even color
+					label.setForeground(new Color(0xB6C3CF));
+				}
+
+				Boolean isChecked = (Boolean) label.getClientProperty("checked");
+				if (Boolean.TRUE.equals(isChecked)) {
+					label.setBackground(new Color(0xC90033)); // checked 색상
+					label.setForeground(Color.WHITE);
+				}
+			}
+		}
 	}
 
-	
-	
-
 	// 메뉴바 생성
-	 public JMenuBar createMenuBar() {
-		 
-	        JMenuBar menuBar = new JMenuBar();
-	        menuBar.setFont(customFont);
-	        
-	        JMenu fileMenu = new JMenu("File");
-	        fileMenu.setFont(customFont);
-	 
-	        
-	        JMenuItem newFileItem = new JMenuItem("New");
-	        JMenuItem importMidiItem = new JMenuItem("Import json");
-	        JMenuItem exportMidiItem = new JMenuItem("Export json");
-	        JMenuItem exitItem = new JMenuItem("Exit");
+	public JMenuBar createMenuBar() {
 
-	        // 메뉴에 아이템 추가
-	        fileMenu.add(newFileItem);
-	        fileMenu.add(importMidiItem);
-	        fileMenu.add(exportMidiItem);
-	        fileMenu.addSeparator();
-	        fileMenu.add(exitItem);
-	        menuBar.add(fileMenu);
-	        
-	        
-	        
-	        newFileItem.addActionListener(e -> handleNewFile());
-	        importMidiItem.addActionListener(e -> importScore());
-	        exportMidiItem.addActionListener(e -> exportScore());
+		JMenuBar menuBar = new JMenuBar();
+		menuBar.setFont(customFont);
 
-	        exitItem.addActionListener(e -> System.exit(0)); 
+		JMenu fileMenu = new JMenu("File");
+		fileMenu.setFont(customFont);
 
-	        return menuBar;
-	    }
-	
-	 
-	 private void handleNewFile() {
-		 
-		    boolean hasCheckedLabels = midiLabels.stream().anyMatch(label -> Boolean.TRUE.equals(label.getClientProperty("checked")));
+		JMenuItem newFileItem = new JMenuItem("New");
+		JMenuItem importMidiItem = new JMenuItem("Import json");
+		JMenuItem exportMidiItem = new JMenuItem("Export json");
+		JMenuItem exitItem = new JMenuItem("Exit");
 
-		    if (hasCheckedLabels) {
-		        int result = JOptionPane.showConfirmDialog(
-		            frame,
-		            "작업 중인 내역이 있습니다. 저장하시겠습니까?",
-		            "확인",
-		            JOptionPane.YES_NO_CANCEL_OPTION, // 예/아니오/취소
-		            JOptionPane.WARNING_MESSAGE
-		        );
+		// 메뉴에 아이템 추가
+		fileMenu.add(newFileItem);
+		fileMenu.add(importMidiItem);
+		fileMenu.add(exportMidiItem);
+		fileMenu.addSeparator();
+		fileMenu.add(exitItem);
+		menuBar.add(fileMenu);
 
-		        if (result == JOptionPane.YES_OPTION) {
-		        	
-		            exportScore(); 
-		            resetAllLabels(); 
-		            System.out.println("새 작업 시작");
-		            
-		        } else if (result == JOptionPane.NO_OPTION) {
-		        	
-		            resetAllLabels();
-		            System.out.println("라벨 초기화 , 새 작업 시작");
-		            
-		        } else if (result == JOptionPane.CANCEL_OPTION) {
-		        	
-		            System.out.println("작업 취소");
-		            
-		        }
-		        
-		    } else {
-		    	
-		        resetAllLabels(); // 선택된 라벨이 없으면 바로 초기화
-		        System.out.println("새 작업 시작");
-		        
-		    }
+		newFileItem.addActionListener(e -> handleNewFile());
+		importMidiItem.addActionListener(e -> importScore());
+		exportMidiItem.addActionListener(e -> exportScore());
+
+		exitItem.addActionListener(e -> System.exit(0));
+
+		return menuBar;
+	}
+
+	private void handleNewFile() {
+
+		boolean hasCheckedLabels = midiLabels.stream()
+				.anyMatch(label -> Boolean.TRUE.equals(label.getClientProperty("checked")));
+
+		if (hasCheckedLabels) {
+			int result = JOptionPane.showConfirmDialog(frame, "작업 중인 내역이 있습니다. 저장하시겠습니까?", "확인",
+					JOptionPane.YES_NO_CANCEL_OPTION, // 예/아니오/취소
+					JOptionPane.WARNING_MESSAGE);
+
+			if (result == JOptionPane.YES_OPTION) {
+
+				exportScore();
+				resetAllLabels();
+				System.out.println("새 작업 시작");
+
+			} else if (result == JOptionPane.NO_OPTION) {
+
+				resetAllLabels();
+				System.out.println("라벨 초기화 , 새 작업 시작");
+
+			} else if (result == JOptionPane.CANCEL_OPTION) {
+
+				System.out.println("작업 취소");
+
+			}
+
+		} else {
+
+			resetAllLabels(); // 선택된 라벨이 없으면 바로 초기화
+			System.out.println("새 작업 시작");
+
 		}
+	}
 
-	 
-	 
 	// 타이틀 바 생성
-	public void createTitleBar() {}
+	public void createTitleBar() {
+	}
 
 	// 폰트 커스텀
 	private Font setCustomFont(String fontName, int fontSize) {
@@ -748,110 +719,102 @@ public class MainContoller {
 		}
 
 	}
-	
 
-
-	
 	public void importScore() {
-	    try {
-	        // JSON 파일 읽기
-	        JFileChooser fileChooser = new JFileChooser();
-	        fileChooser.setDialogTitle("Select JSON File to Import");
-	        int result = fileChooser.showOpenDialog(frame);
-	        
-	        if (result == JFileChooser.APPROVE_OPTION) {
-	            File selectedFile = fileChooser.getSelectedFile();
-	            BufferedReader reader = new BufferedReader(new FileReader(selectedFile));
-	            StringBuilder jsonContent = new StringBuilder();
-	            String line;
-	            while ((line = reader.readLine()) != null) {
-	                jsonContent.append(line);
-	            }
-	            reader.close();
+		try {
+			// JSON 파일 읽기
+			JFileChooser fileChooser = new JFileChooser();
+			fileChooser.setDialogTitle("Select JSON File to Import");
+			int result = fileChooser.showOpenDialog(frame);
 
-	            // JSON 파싱
-	            JSONObject jsonScore = new JSONObject(jsonContent.toString());
-	            JSONArray notesArray = jsonScore.getJSONArray("notes");
+			if (result == JFileChooser.APPROVE_OPTION) {
+				File selectedFile = fileChooser.getSelectedFile();
+				BufferedReader reader = new BufferedReader(new FileReader(selectedFile));
+				StringBuilder jsonContent = new StringBuilder();
+				String line;
+				while ((line = reader.readLine()) != null) {
+					jsonContent.append(line);
+				}
+				reader.close();
 
-	            // MIDI 라벨 초기화
-	            resetAllLabels();
+				// JSON 파싱
+				JSONObject jsonScore = new JSONObject(jsonContent.toString());
+				JSONArray notesArray = jsonScore.getJSONArray("notes");
 
-	            // JSON 데이터를 MIDI 라벨에 반영
-	            for (int i = 0; i < notesArray.length(); i++) {
-	                JSONObject noteObject = notesArray.getJSONObject(i);
-	                String scaleName = noteObject.getString("pitch");
-	                int columnIndex = noteObject.getInt("index");
+				// MIDI 라벨 초기화
+				resetAllLabels();
 
-	                for (JLabel label : midiLabels) {
-	                    String labelScale = (String) label.getClientProperty("scale_name");
-	                    int labelColumn = (int) label.getClientProperty("scale_pos");
+				// JSON 데이터를 MIDI 라벨에 반영
+				for (int i = 0; i < notesArray.length(); i++) {
+					JSONObject noteObject = notesArray.getJSONObject(i);
+					String scaleName = noteObject.getString("pitch");
+					int columnIndex = noteObject.getInt("index");
 
-	                    if (labelScale.equals(scaleName) && labelColumn == columnIndex) {
-	                        label.setBackground(new Color(0xC90033));
-	                        label.setForeground(Color.WHITE);
-	                        label.putClientProperty("checked", true);
-	                    }
-	                }
-	            }
+					for (JLabel label : midiLabels) {
+						String labelScale = (String) label.getClientProperty("scale_name");
+						int labelColumn = (int) label.getClientProperty("scale_pos");
 
-	            System.out.println("JSON 악보 load");
-	        }
+						if (labelScale.equals(scaleName) && labelColumn == columnIndex) {
+							label.setBackground(new Color(0xC90033));
+							label.setForeground(Color.WHITE);
+							label.putClientProperty("checked", true);
+						}
+					}
+				}
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        System.out.println("JSON 악보 load fail");
-	    }
+				System.out.println("JSON 악보 load");
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("JSON 악보 load fail");
+		}
 	}
 
 	public void exportScore() {
-	    try {
-	        // JSON 객체 생성
-	        JSONObject jsonScore = new JSONObject();
-	        jsonScore.put("title", "Custom Score");
-	        jsonScore.put("tempo", 120);
+		try {
+			// JSON 객체 생성
+			JSONObject jsonScore = new JSONObject();
+			jsonScore.put("title", "Custom Score");
+			jsonScore.put("tempo", 120);
 
-	        JSONArray notesArray = new JSONArray();
-	        for (JLabel label : midiLabels) {
-	            Boolean isChecked = (Boolean) label.getClientProperty("checked");
-	            if (Boolean.TRUE.equals(isChecked)) {
-	                JSONObject noteObject = new JSONObject();
-	                noteObject.put("pitch", (String) label.getClientProperty("scale_name"));
-	                noteObject.put("index", (int) label.getClientProperty("scale_pos"));
-	                notesArray.put(noteObject);
-	            }
-	        }
+			JSONArray notesArray = new JSONArray();
+			for (JLabel label : midiLabels) {
+				Boolean isChecked = (Boolean) label.getClientProperty("checked");
+				if (Boolean.TRUE.equals(isChecked)) {
+					JSONObject noteObject = new JSONObject();
+					noteObject.put("pitch", (String) label.getClientProperty("scale_name"));
+					noteObject.put("index", (int) label.getClientProperty("scale_pos"));
+					notesArray.put(noteObject);
+				}
+			}
 
-	        jsonScore.put("notes", notesArray);
+			jsonScore.put("notes", notesArray);
 
-	        // JSON 파일 저장
-	        JFileChooser fileChooser = new JFileChooser();
-	        fileChooser.setDialogTitle("Save JSON File");
-	        int result = fileChooser.showSaveDialog(frame);
+			// JSON 파일 저장
+			JFileChooser fileChooser = new JFileChooser();
+			fileChooser.setDialogTitle("Save JSON File");
+			int result = fileChooser.showSaveDialog(frame);
 
-	        if (result == JFileChooser.APPROVE_OPTION) {
-	            File selectedFile = fileChooser.getSelectedFile();
-	            if (!selectedFile.getName().endsWith(".json")) {
-	                selectedFile = new File(selectedFile.getAbsolutePath() + ".json");
-	            }
+			if (result == JFileChooser.APPROVE_OPTION) {
+				File selectedFile = fileChooser.getSelectedFile();
+				if (!selectedFile.getName().endsWith(".json")) {
+					selectedFile = new File(selectedFile.getAbsolutePath() + ".json");
+				}
 
-	            FileWriter fileWriter = new FileWriter(selectedFile);
-	            fileWriter.write(jsonScore.toString(4)); // JSON 들여쓰기
-	            fileWriter.close();
+				FileWriter fileWriter = new FileWriter(selectedFile);
+				fileWriter.write(jsonScore.toString(4)); // JSON 들여쓰기
+				fileWriter.close();
 
-	            System.out.println("악보가 JSON 파일로 저장: " + selectedFile.getAbsolutePath());
-	        }
+				System.out.println("악보가 JSON 파일로 저장: " + selectedFile.getAbsolutePath());
+			}
 
-	    } catch (Exception e) {
-	    	
-	        e.printStackTrace();
-	        System.out.println("JSON 파일 저장 실패.");
-	        
-	    }
+		} catch (Exception e) {
+
+			e.printStackTrace();
+			System.out.println("JSON 파일 저장 실패.");
+
+		}
 	}
-	
-	
-	
-	
-	
-	
+
 }
