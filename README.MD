@@ -20,7 +20,8 @@ https://github.com/KIM-YONG-HA/OrgolScore/tree/main/OrgolScore/src/simple
 <br>
 
 ## [작업기간]
-24.11.26 ~ 24.12.20(약 1개월)
+24.11.26 ~ 24.12.20(약 1개월)   
+
 <br>
 
 ## [진행상황] : 기능 일부 구현 후 중단
